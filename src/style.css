@@ -1,0 +1,96 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgb(75, 69, 69);
+}
+
+#board {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-areas: "." "." "." "." "." "." "." ".";
+  border: 1px solid black;
+  height: 480px;
+  width: 480px;
+  background-color: transparent;
+}
+
+#board .row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1fr;
+  gap: 1px 1px;
+  grid-template-areas: ". . . . . . . .";
+}
+
+#board div {
+  background-repeat: no-repeat;
+  background-size: 100%;
+}
+
+.lightgreen {
+  background-color: rgb(235, 235, 209);
+}
+.green {
+  background-color: rgb(120, 147, 88);
+}
+
+.black_pons {
+  background-image: url("./assets/black_pons.svg");
+}
+.black_rock {
+  background-image: url("./assets/black_rock.svg");
+}
+.black_horse {
+  background-image: url("./assets/black_horse.svg");
+}
+.black_bishop {
+  background-image: url("./assets/black_bishop.svg");
+}
+.black_queen {
+  background-image: url("./assets/black_queen.svg");
+}
+.black_king {
+  background-image: url("./assets/black_king.svg");
+}
+
+.white_pons {
+  background-image: url("./assets/white_pons.svg");
+}
+.white_rock {
+  background-image: url("./assets/white_rock.svg");
+}
+.white_horse {
+  background-image: url("./assets/white_horse.svg");
+}
+.white_bishop {
+  background-image: url("./assets/white_bishop.svg");
+}
+.white_queen {
+  background-image: url("./assets/white_queen.svg");
+}
+.white_king {
+  background-image: url("./assets/white_king.svg");
+}
+
+.player_turn {
+  margin-left: 25px;
+  height: 100px;
+  width: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgb(120, 147, 88);
+  color: white;
+  font-size: 20px;
+}
+.blank {
+  background-image: none;
+}
