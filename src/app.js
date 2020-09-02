@@ -354,6 +354,33 @@ const game = () => {
     UpdateBoard(currentBoard, grid);
     pons_selected = null;
   }
+
+  // UTILITIES
+
+  function isWhite(color) {
+    if (
+      color == 1 ||
+      color == 2 ||
+      color == 3 ||
+      color == 4 ||
+      color == 5 ||
+      color == 6
+    ) {
+      return true;
+    } else if (
+      color == 11 ||
+      color == 12 ||
+      color == 13 ||
+      color == 14 ||
+      color == 15 ||
+      color == 16
+    ) {
+      return false;
+    } else {
+      return null;
+    }
+  }
+
   function removeOld(oldNode, color, pons_class) {
     oldNode.classList.remove(color);
     oldNode.classList.remove(pons_class);
@@ -368,6 +395,7 @@ const game = () => {
     html.classList.remove("white_king");
     html.classList.remove("selected");
     html.classList.remove("blank");
+    html.classList.add("black");
     UpdateBoard(currentBoard, grid);
   };
   const removeBlack = html => {
@@ -380,24 +408,38 @@ const game = () => {
     html.classList.remove("black_king");
     html.classList.remove("selected");
     html.classList.remove("blank");
+    html.classList.add("white");
     UpdateBoard(currentBoard, grid);
   };
+
+  function updatePons(color, pons, x, y, previousX, previousY) {
+    currentBoard[previousX][previousY] = 0;
+    currentBoard[x][y] = pons;
+    if (color === "white") {
+      player_display.innerText = "Black turn";
+    }
+    if (color === "black") {
+      player_display.innerText = "White turn";
+    }
+    white_turn = !white_turn;
+  }
+
+  // END OF UTILITIES
+
   // WHITE
   function moveWhitePons(html, pons, x, y, previousX, previousY) {
     const moveForward = () => {
-      currentBoard[x][y] = pons;
-      currentBoard[previousX][previousY] = 0;
-      player_display.innerText = "Black turn";
-      white_turn = !white_turn;
+      updatePons("white", pons, x, y, previousX, previousY);
       removeBlack(html);
     };
-    const moveEat = () => {};
+    const moveEat = () => {
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
+    };
 
     const moveBegining = () => {
-      currentBoard[x][y] = pons;
-      currentBoard[previousX][previousY] = 0;
-      player_display.innerText = "Black turn";
-      white_turn = !white_turn;
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
     };
 
     if (y == previousY && previousX > x) {
@@ -406,36 +448,118 @@ const game = () => {
       } else if (previousX == 6 && previousX - 2 <= x) {
         moveBegining();
       }
-    } else if (currentBoard[x - 1][y - 1] == 2) {
+    } else if (
+      (y - 1 == previousY || y + 1 == previousY) &&
+      previousX > x &&
+      isWhite(currentBoard[x][y]) == false
+    ) {
       moveEat();
     }
   }
 
-  function moveWhiteHorse(html, pons, x, y, previousX, previousY) {}
-  function moveWhiteBishop(html, pons, x, y, previousX, previousY) {}
-  function moveWhiteRock(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteHorse(html, pons, x, y, previousX, previousY) {
+    const move = () => {
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
+    };
+    if (
+      isWhite(currentBoard[x][y]) == false ||
+      isWhite(currentBoard[x][y]) == null
+    ) {
+      if (
+        (x - 2 == previousX || x + 2 == previousX) &&
+        (y - 1 == previousY || y + 1 == previousY)
+      ) {
+        move();
+      } else if (
+        (y - 2 == previousY || y + 2 == previousY) &&
+        (x - 1 == previousX || x + 1 == previousX)
+      ) {
+        move();
+      }
+    }
+  }
+  function moveWhiteBishop(html, pons, x, y, previousX, previousY) {
+    const move = () => {
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
+    };
+    // console.log(previousX);
+    // console.log(previousY);
+
+    // LEFT UP CHECK
+
+    if (x < previousX && y < previousY) {
+      let i = 0;
+      let possibleTopLeft;
+      while (i < 8) {
+        console.log(i);
+        i++;
+        if (previousX - i < 0 || previousY - i < 0) {
+          possibleTopLeft = true;
+          i = 8;
+          return;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == true) {
+          possibleTopLeft = false;
+          return;
+        } else {
+          possibleTopLeft = true;
+        }
+      }
+
+      if (possibleTopLeft) {
+        move();
+      }
+    }
+  }
+  function moveWhiteRock(html, pons, x, y, previousX, previousY) {
+    let possibleLeft;
+    let possibleTop = true;
+    let possibleRight;
+    let possibleBottom;
+    let limitX;
+    let limitY;
+    const move = () => {
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
+    };
+
+    // TOP CHECK
+    if (x < previousX && y == previousY) {
+      for (let i = previousX - 1; i >= x; i--) {
+        if (isWhite(currentBoard[i][y]) == false) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == true) {
+          possibleTop = false;
+          break;
+        }
+      }
+      if (x < limitX) {
+        possibleTop = false;
+      }
+      if (possibleTop) {
+        move();
+      }
+    }
+  }
   function moveWhiteQueen(html, pons, x, y, previousX, previousY) {}
   function moveWhiteKing(html, pons, x, y, previousX, previousY) {}
 
   // BLACK
   function moveBlackPons(html, pons, x, y, previousX, previousY) {
     const moveForward = () => {
-      currentBoard[x][y] = pons;
-
-      currentBoard[previousX][previousY] = 0;
-      player_display.innerText = "White turn";
-      white_turn = !white_turn;
+      updatePons("black", pons, x, y, previousX, previousY);
       removeWhite(html);
     };
     const moveEat = () => {
-      player_display.innerText = "White turn";
-      currentBoard[x][y] = pons;
+      updatePons("black", pons, x, y, previousX, previousY);
+      removeWhite(html);
     };
     const moveBegining = () => {
-      currentBoard[x][y] = pons;
-      currentBoard[previousX][previousY] = 0;
-      player_display.innerText = "White turn";
-      white_turn = !white_turn;
+      updatePons("black", pons, x, y, previousX, previousY);
     };
     if (y == previousY && previousX < x) {
       if (previousX != 1 && previousX + 1 >= x && currentBoard[x][y] == 0) {
@@ -443,13 +567,60 @@ const game = () => {
       } else if (previousX == 1 && previousX + 2 >= x) {
         moveBegining();
       }
-    } else if (currentBoard[previousX + 1][previousY + 1] != 0) {
+    } else if (
+      (y - 1 == previousY || y + 1 == previousY) &&
+      previousX < x &&
+      isWhite(currentBoard[x][y]) == true
+    ) {
       moveEat();
     }
   }
-  function moveBlackHorse(html, pons, x, y, previousX, previousY) {}
+  function moveBlackHorse(html, pons, x, y, previousX, previousY) {
+    const move = () => {
+      updatePons("black", pons, x, y, previousX, previousY);
+      removeWhite(html);
+    };
+    if (
+      isWhite(currentBoard[x][y]) == true ||
+      isWhite(currentBoard[x][y]) == null
+    ) {
+      if (
+        (x - 2 == previousX || x + 2 == previousX) &&
+        (y - 1 == previousY || y + 1 == previousY)
+      ) {
+        move();
+      } else if (
+        (y - 2 == previousY || y + 2 == previousY) &&
+        (x - 1 == previousX || x + 1 == previousX)
+      ) {
+        move();
+      }
+    }
+  }
   function moveBlackBishop(html, pons, x, y, previousX, previousY) {
-    console.log("black bishop");
+    return;
+    const move = () => {
+      updatePons("black", pons, x, y, previousX, previousY);
+      removeWhite(html);
+    };
+
+    for (let i = 0; i < 8; i++) {
+      if (
+        (isWhite(currentBoard[x - i][y - i]) == true ||
+          isWhite(currentBoard[x - i][y - i]) == null) &&
+        y != previousY
+      ) {
+        if (y + i == previousY && x + i == previousX) {
+          move();
+        } else if (y - i == previousY && x + i == previousX) {
+          move();
+        } else if (y - i == previousY && x - i == previousX) {
+          move();
+        } else if (y + i == previousY && x - i == previousX) {
+          move();
+        }
+      }
+    }
   }
   function moveBlackRock(html, pons, x, y, previousX, previousY) {}
   function moveBlackQueen(html, pons, x, y, previousX, previousY) {}
