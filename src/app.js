@@ -214,36 +214,48 @@ const game = () => {
   let pons_selected = null;
   let previousX;
   let previousY;
-
+  let OldNode;
   for (let x = 0; x < board.childNodes.length; x++) {
     let rowNodes = board.childNodes[x];
     for (let y = 0; y < rowNodes.childNodes.length; y++) {
       let colNodes = rowNodes.childNodes[y];
-      colNodes.addEventListener("click", () => {
-        console.log(white_turn);
+      colNodes.addEventListener("click", e => {
         if (white_turn) {
           if (pons_selected == null) {
-            white_selection(colNodes, x, y);
+            OldNode = rowNodes.childNodes[y];
+
+            white_selection(colNodes);
             previousX = x;
             previousY = y;
           } else {
-            move(pons_selected, x, y, previousX, previousY);
+            OldNode.classList.remove("selected");
+
+            move(OldNode, colNodes, pons_selected, x, y, previousX, previousY);
           }
         } else {
           player_display.innerText = "Black turn";
           if (pons_selected == null) {
+            OldNode = rowNodes.childNodes[y];
             black_selection(colNodes, x, y);
             previousX = x;
             previousY = y;
           } else {
-            move(pons_selected, x, y, previousX, previousY);
+            OldNode.classList.remove("selected");
+            move(OldNode, colNodes, pons_selected, x, y, previousX, previousY);
           }
         }
       });
     }
   }
 
-  function white_selection(pons, x, y) {
+  function white_selection(pons) {
+    if (
+      !pons.classList.contains("blank") &&
+      !pons.classList.contains("black")
+    ) {
+      pons.classList.add("selected");
+    }
+
     if (pons.classList.contains("white_pons")) {
       pons_selected = 1;
     } else if (pons.classList.contains("white_horse")) {
@@ -259,7 +271,14 @@ const game = () => {
     }
   }
 
-  function black_selection(pons, x, y) {
+  function black_selection(pons) {
+    if (
+      !pons.classList.contains("blank") &&
+      !pons.classList.contains("white")
+    ) {
+      pons.classList.add("selected");
+    }
+
     if (pons.classList.contains("black_pons")) {
       pons_selected = 11;
     } else if (pons.classList.contains("black_horse")) {
@@ -274,47 +293,59 @@ const game = () => {
       pons_selected = 16;
     }
   }
-  function move(pons, x, y, previousX, previousY) {
+  function move(OldNode, html, pons, x, y, previousX, previousY) {
     // currentBoard[x][y] = pons;
     // currentBoard[previousX][previousY] = 0;
     switch (pons) {
       case 0:
         break;
       case 1:
-        moveWhitePons(pons, x, y, previousX, previousY);
+        moveWhitePons(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "white", "white_pons");
         break;
       case 2:
-        moveWhiteHorse(pons, x, y, previousX, previousY);
+        moveWhiteHorse(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "white", "white_horse");
         break;
       case 3:
-        moveWhiteBishop(pons, x, y, previousX, previousY);
+        moveWhiteBishop(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "white", "white_bishop");
         break;
       case 4:
-        moveWhiteRock(pons, x, y, previousX, previousY);
+        moveWhiteRock(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "white", "white_rock");
         break;
       case 5:
-        moveWhiteQueen(pons, x, y, previousX, previousY);
+        moveWhiteQueen(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "white", "white_queen");
         break;
       case 6:
-        moveWhiteKing(pons, x, y, previousX, previousY);
+        moveWhiteKing(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "white", "white_king");
         break;
       case 11:
-        moveBlackPons(pons, x, y, previousX, previousY);
+        moveBlackPons(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "black", "black_pons");
         break;
       case 12:
-        moveBlackHorse(pons, x, y, previousX, previousY);
+        moveBlackHorse(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "black", "black_horse");
         break;
       case 13:
-        moveBlackBishop(pons, x, y, previousX, previousY);
+        moveBlackBishop(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "black", "black_bishop");
         break;
       case 14:
-        moveBlackRock(pons, x, y, previousX, previousY);
+        moveBlackRock(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "black", "black_rock");
         break;
       case 15:
-        moveBlackQueen(pons, x, y, previousX, previousY);
+        moveBlackQueen(html, pons, x, y, previousX, previousY);
+        removeOld(OldNode, "black", "black_queen");
         break;
       case 16:
         moveBlackKing(pons, x, y, previousX, previousY);
+        removeOld(OldNode, "black", "black_king");
         break;
       default:
         break;
@@ -323,56 +354,106 @@ const game = () => {
     UpdateBoard(currentBoard, grid);
     pons_selected = null;
   }
-
+  function removeOld(oldNode, color, pons_class) {
+    oldNode.classList.remove(color);
+    oldNode.classList.remove(pons_class);
+  }
+  const removeWhite = html => {
+    html.classList.remove("white");
+    html.classList.remove("white_pons");
+    html.classList.remove("white_horse");
+    html.classList.remove("white_bishop");
+    html.classList.remove("white_rock");
+    html.classList.remove("white_queen");
+    html.classList.remove("white_king");
+    html.classList.remove("selected");
+    html.classList.remove("blank");
+    UpdateBoard(currentBoard, grid);
+  };
+  const removeBlack = html => {
+    html.classList.remove("black");
+    html.classList.remove("black_pons");
+    html.classList.remove("black_horse");
+    html.classList.remove("black_bishop");
+    html.classList.remove("black_rock");
+    html.classList.remove("black_queen");
+    html.classList.remove("black_king");
+    html.classList.remove("selected");
+    html.classList.remove("blank");
+    UpdateBoard(currentBoard, grid);
+  };
   // WHITE
-  function moveWhitePons(pons, x, y, previousX, previousY) {
+  function moveWhitePons(html, pons, x, y, previousX, previousY) {
     const moveForward = () => {
       currentBoard[x][y] = pons;
       currentBoard[previousX][previousY] = 0;
       player_display.innerText = "Black turn";
       white_turn = !white_turn;
+      removeBlack(html);
     };
     const moveEat = () => {};
-    if (y == previousY) {
-      moveForward();
-    } else {
+
+    const moveBegining = () => {
+      currentBoard[x][y] = pons;
+      currentBoard[previousX][previousY] = 0;
+      player_display.innerText = "Black turn";
+      white_turn = !white_turn;
+    };
+
+    if (y == previousY && previousX > x) {
+      if (previousX != 6 && previousX - 1 <= x && currentBoard[x][y] == 0) {
+        moveForward();
+      } else if (previousX == 6 && previousX - 2 <= x) {
+        moveBegining();
+      }
+    } else if (currentBoard[x - 1][y - 1] == 2) {
       moveEat();
     }
   }
-  function moveWhiteHorse(pons, x, y, previousX, previousY) {}
-  function moveWhiteBishop(pons, x, y, previousX, previousY) {}
-  function moveWhiteRock(pons, x, y, previousX, previousY) {}
-  function moveWhiteQueen(pons, x, y, previousX, previousY) {}
-  function moveWhiteKing(pons, x, y, previousX, previousY) {}
+
+  function moveWhiteHorse(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteBishop(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteRock(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteQueen(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteKing(html, pons, x, y, previousX, previousY) {}
 
   // BLACK
-  function moveBlackPons(pons, x, y, previousX, previousY) {
+  function moveBlackPons(html, pons, x, y, previousX, previousY) {
     const moveForward = () => {
+      currentBoard[x][y] = pons;
+
+      currentBoard[previousX][previousY] = 0;
+      player_display.innerText = "White turn";
+      white_turn = !white_turn;
+      removeWhite(html);
+    };
+    const moveEat = () => {
+      player_display.innerText = "White turn";
+      currentBoard[x][y] = pons;
+    };
+    const moveBegining = () => {
       currentBoard[x][y] = pons;
       currentBoard[previousX][previousY] = 0;
       player_display.innerText = "White turn";
       white_turn = !white_turn;
     };
-    const moveEat = () => {
-      player_display.innerText = "White turn";
-      currentBoard[x + 1][y + 1] = pons;
-      currentBoard[previousX][previousY] = 0;
-    };
-    if (y == previousY) {
-      moveForward();
-    }
-    if (currentBoard[x + 1][y + 1] === 2) {
-      console.log("yes");
+    if (y == previousY && previousX < x) {
+      if (previousX != 1 && previousX + 1 >= x && currentBoard[x][y] == 0) {
+        moveForward();
+      } else if (previousX == 1 && previousX + 2 >= x) {
+        moveBegining();
+      }
+    } else if (currentBoard[previousX + 1][previousY + 1] != 0) {
       moveEat();
     }
   }
-  function moveBlackHorse(pons, x, y, previousX, previousY) {}
-  function moveBlackBishop(pons, x, y, previousX, previousY) {
+  function moveBlackHorse(html, pons, x, y, previousX, previousY) {}
+  function moveBlackBishop(html, pons, x, y, previousX, previousY) {
     console.log("black bishop");
   }
-  function moveBlackRock(pons, x, y, previousX, previousY) {}
-  function moveBlackQueen(pons, x, y, previousX, previousY) {}
-  function moveBlackKing(pons, x, y, previousX, previousY) {}
+  function moveBlackRock(html, pons, x, y, previousX, previousY) {}
+  function moveBlackQueen(html, pons, x, y, previousX, previousY) {}
+  function moveBlackKing(html, pons, x, y, previousX, previousY) {}
 };
 
 game();
