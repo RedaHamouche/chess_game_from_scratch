@@ -54,7 +54,7 @@ let currentBoard = [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 6, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
   [4, 2, 3, 5, 6, 3, 2, 4]
 ];
@@ -225,7 +225,7 @@ const game = () => {
         if (white_turn) {
           if (pons_selected == null) {
             OldNode = rowNodes.childNodes[y];
-
+            checkMateWhite(colNodes);
             white_selection(colNodes);
             previousX = x;
             previousY = y;
@@ -250,8 +250,28 @@ const game = () => {
     }
   }
 
+  // UTILITIES
+
+  function checkMateWhite(pons) {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        let kingPons = currentBoard[i][j];
+        if (kingPons == 6) {
+          kingIndex = [i, j];
+        }
+      }
+    }
+    return true;
+  }
+
   function white_selection(pons) {
-    if (
+    if (checkMateWhite()) {
+      for (let i = 0; i < grid.length; i++) {
+        if (grid[i].classList.contains("white_king")) {
+          grid[i].classList.add("selected");
+        }
+      }
+    } else if (
       !pons.classList.contains("blank") &&
       !pons.classList.contains("black")
     ) {
@@ -295,6 +315,7 @@ const game = () => {
       pons_selected = 16;
     }
   }
+  function checkMate() {}
   function move(OldNode, html, pons, x, y, previousX, previousY) {
     // currentBoard[x][y] = pons;
     // currentBoard[previousX][previousY] = 0;
@@ -356,8 +377,6 @@ const game = () => {
     UpdateBoard(currentBoard, grid);
     pons_selected = null;
   }
-
-  // UTILITIES
 
   function isWhite(color) {
     if (
@@ -465,7 +484,6 @@ const game = () => {
     };
 
     if (y == previousY && previousX > x) {
-      console.log(isWhite(currentBoard[previousX - 1][y]));
       if (
         previousX != 6 &&
         previousX - 1 <= x &&
@@ -911,8 +929,6 @@ const game = () => {
       updatePons("white", pons, x, y, previousX, previousY);
       removeBlack(html);
     };
-    console.log(x, y);
-    console.log(previousX, previousY);
 
     if (
       isWhite(currentBoard[x][y]) == false ||
