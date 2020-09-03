@@ -47,12 +47,13 @@ createBoard();
 // 6 = king
 // let currentBoard;
 
+// DATA ANCHOR
 let currentBoard = [
   [14, 12, 13, 15, 16, 13, 12, 14],
   [11, 11, 11, 11, 11, 11, 11, 11],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 3, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
   [4, 2, 3, 5, 6, 3, 2, 4]
@@ -509,8 +510,6 @@ const game = () => {
       updatePons("white", pons, x, y, previousX, previousY);
       removeBlack(html);
     };
-    // console.log(previousX);
-    // console.log(previousY);
 
     // LEFT UP CHECK
     if (
@@ -519,7 +518,7 @@ const game = () => {
       x + diff == previousX &&
       y + diff == previousY
     ) {
-      for (let i = diff; i > 0; i--) {
+      for (let i = 1; i <= diff; i++) {
         if (isWhite(currentBoard[previousX - i][previousY - i]) == false) {
           limit = i;
           break;
@@ -529,16 +528,14 @@ const game = () => {
           break;
         }
       }
-      console.log(limit);
-      console.log(previousX);
-
-      if (previousX <= limit) {
+      if (diff != limit && limit) {
         possible = false;
       }
       if (possible) {
         move();
       }
     }
+
     // RIGHT UP CHECK
 
     if (
@@ -547,12 +544,71 @@ const game = () => {
       x + diff == previousX &&
       y - diff == previousY
     ) {
-      console.log("going right up");
-      for (let i = 0; i < diff; i++) {
-        if (isWhite(currentBoard[x + i][y - i]) == true) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == true) {
           possible = false;
           break;
         }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+
+    // BOTTOM RIGHT CHECK
+    if (
+      x > previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM LEFT CHECK
+    if (
+      x > previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
       }
 
       if (possible) {
@@ -646,7 +702,200 @@ const game = () => {
       }
     }
   }
-  function moveWhiteQueen(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteQueen(html, pons, x, y, previousX, previousY) {
+    let diff = previousX - x;
+    let possible = true;
+    let limit;
+    let limitX;
+    let limitY;
+
+    const move = () => {
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
+    };
+
+    // LEFT CHECK
+    if (y < previousY && x == previousX) {
+      for (let i = previousY - 1; i >= y; i--) {
+        if (isWhite(currentBoard[x][i]) == false) {
+          limitY = i;
+
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (y < limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // UP CHECK
+    if (x < previousX && y == previousY) {
+      for (let i = previousX - 1; i >= x; i--) {
+        if (isWhite(currentBoard[i][y]) == false) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (x < limitX) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // RIGHT CHECK
+    if (y > previousY && x == previousX) {
+      for (let i = previousY + 1; i <= y; i++) {
+        if (isWhite(currentBoard[x][i]) == false) {
+          limitY = i;
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (y > limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM CHECK
+    if (x > previousX && y == previousY) {
+      for (let i = previousX + 1; i <= x; i++) {
+        if (isWhite(currentBoard[i][y]) == false) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (x > limitX) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // LEFT UP CHECK
+    if (
+      x < previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+
+    // RIGHT UP CHECK
+
+    if (
+      x < previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+
+    // BOTTOM RIGHT CHECK
+    if (
+      x > previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM LEFT CHECK
+    if (
+      x > previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == false) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+  }
   function moveWhiteKing(html, pons, x, y, previousX, previousY) {}
 
   // BLACK
@@ -699,32 +948,402 @@ const game = () => {
     }
   }
   function moveBlackBishop(html, pons, x, y, previousX, previousY) {
-    return;
+    let diff = previousX - x;
+    let possible = true;
+    let limit;
+
     const move = () => {
       updatePons("black", pons, x, y, previousX, previousY);
       removeWhite(html);
     };
 
-    for (let i = 0; i < 8; i++) {
-      if (
-        (isWhite(currentBoard[x - i][y - i]) == true ||
-          isWhite(currentBoard[x - i][y - i]) == null) &&
-        y != previousY
-      ) {
-        if (y + i == previousY && x + i == previousX) {
-          move();
-        } else if (y - i == previousY && x + i == previousX) {
-          move();
-        } else if (y - i == previousY && x - i == previousX) {
-          move();
-        } else if (y + i == previousY && x - i == previousX) {
-          move();
+    // LEFT UP CHECK
+    if (
+      x < previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == true) {
+          limit = i;
+          break;
         }
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+
+    // RIGHT UP CHECK
+
+    if (
+      x < previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+
+    // BOTTOM RIGHT CHECK
+    if (
+      x > previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM LEFT CHECK
+    if (
+      x > previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
       }
     }
   }
-  function moveBlackRock(html, pons, x, y, previousX, previousY) {}
-  function moveBlackQueen(html, pons, x, y, previousX, previousY) {}
+  function moveBlackRock(html, pons, x, y, previousX, previousY) {
+    let possible = true;
+    let limitX;
+    let limitY;
+
+    const move = () => {
+      updatePons("black", pons, x, y, previousX, previousY);
+      removeWhite(html);
+    };
+
+    // LEFT CHECK
+    if (y < previousY && x == previousX) {
+      for (let i = previousY - 1; i >= y; i--) {
+        if (isWhite(currentBoard[x][i]) == true) {
+          limitY = i;
+
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (y < limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // UP CHECK
+    if (x < previousX && y == previousY) {
+      for (let i = previousX - 1; i >= x; i--) {
+        if (isWhite(currentBoard[i][y]) == true) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (x < limitX) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // RIGHT CHECK
+    if (y > previousY && x == previousX) {
+      for (let i = previousY + 1; i <= y; i++) {
+        if (isWhite(currentBoard[x][i]) == true) {
+          limitY = i;
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (y > limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM CHECK
+    if (x > previousX && y == previousY) {
+      for (let i = previousX + 1; i <= x; i++) {
+        if (isWhite(currentBoard[i][y]) == true) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (x > limitX) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+  }
+  function moveBlackQueen(html, pons, x, y, previousX, previousY) {
+    let diff = previousX - x;
+    let possible = true;
+    let limit;
+    let limitX;
+    let limitY;
+
+    const move = () => {
+      updatePons("black", pons, x, y, previousX, previousY);
+      removeWhite(html);
+    };
+
+    // LEFT CHECK
+    if (y < previousY && x == previousX) {
+      for (let i = previousY - 1; i >= y; i--) {
+        if (isWhite(currentBoard[x][i]) == true) {
+          limitY = i;
+
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (y < limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // UP CHECK
+    if (x < previousX && y == previousY) {
+      for (let i = previousX - 1; i >= x; i--) {
+        if (isWhite(currentBoard[i][y]) == true) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (x < limitX) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // RIGHT CHECK
+    if (y > previousY && x == previousX) {
+      for (let i = previousY + 1; i <= y; i++) {
+        if (isWhite(currentBoard[x][i]) == true) {
+          limitY = i;
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (y > limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM CHECK
+    if (x > previousX && y == previousY) {
+      for (let i = previousX + 1; i <= x; i++) {
+        if (isWhite(currentBoard[i][y]) == true) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (x > limitX) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // LEFT UP CHECK
+    if (
+      x < previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+
+    // RIGHT UP CHECK
+
+    if (
+      x < previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX - i][previousY + i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+
+    // BOTTOM RIGHT CHECK
+    if (
+      x > previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY + i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM LEFT CHECK
+    if (
+      x > previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      diff = -diff;
+      for (let i = 1; i <= diff; i++) {
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == true) {
+          limit = i;
+          break;
+        }
+        if (isWhite(currentBoard[previousX + i][previousY - i]) == false) {
+          possible = false;
+          break;
+        }
+      }
+      if (diff != limit && limit) {
+        possible = false;
+      }
+
+      if (possible) {
+        move();
+      }
+    }
+  }
   function moveBlackKing(html, pons, x, y, previousX, previousY) {}
 };
 
