@@ -80,17 +80,38 @@ body {
   background-image: url("./assets/white_king.svg");
 }
 
-.player_turn {
+.menu {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
   margin-left: 25px;
-  height: 100px;
-  width: 100px;
+}
+
+.player_turn,
+.undo {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgb(120, 147, 88);
   color: white;
   font-size: 20px;
+  border-radius: 12px;
 }
+.player_turn {
+  height: 100px;
+  width: 100px;
+  background-color: rgb(120, 147, 88);
+}
+.undo {
+  background-color: lightskyblue;
+  margin-top: 12px;
+  height: 40px;
+  width: 100px;
+}
+.undo:hover {
+  cursor: pointer;
+}
+
 .blank {
   background-image: none;
 }

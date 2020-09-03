@@ -1,5 +1,6 @@
 const board = document.querySelector("#board");
 const player_display = document.querySelector(".player_turn");
+const undo = document.querySelector(".undo");
 let grid;
 function createBoard() {
   let green = true;
@@ -51,7 +52,7 @@ let currentBoard = [
   [11, 11, 11, 11, 11, 11, 11, 11],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 3, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
   [4, 2, 3, 5, 6, 3, 2, 4]
@@ -412,6 +413,26 @@ const game = () => {
     UpdateBoard(currentBoard, grid);
   };
 
+  // TODO HISTORIC TO UNDO
+  // let historicBoard = [currentBoard];
+  // let historicIndex = 0;
+  // let Board = {};
+
+  // function historic(Board) {
+  //   historicBoard.push(Board.data);
+  //   console.log(historicBoard);
+  // }
+  // undo.addEventListener("click", () => {
+  //   historicIndex--;
+  //   if (historicIndex < 0) {
+  //     return;
+  //   }
+  //   let oldBoard = historicBoard[historicIndex];
+
+  //   currentBoard = oldBoard;
+  //   UpdateBoard(currentBoard, grid);
+  // });
+
   function updatePons(color, pons, x, y, previousX, previousY) {
     currentBoard[previousX][previousY] = 0;
     currentBoard[x][y] = pons;
@@ -480,6 +501,10 @@ const game = () => {
     }
   }
   function moveWhiteBishop(html, pons, x, y, previousX, previousY) {
+    let diff = previousX - x;
+    let possible = true;
+    let limit;
+
     const move = () => {
       updatePons("white", pons, x, y, previousX, previousY);
       removeBlack(html);
@@ -488,44 +513,82 @@ const game = () => {
     // console.log(previousY);
 
     // LEFT UP CHECK
-
-    if (x < previousX && y < previousY) {
-      let i = 0;
-      let possibleTopLeft;
-      while (i < 8) {
-        console.log(i);
-        i++;
-        if (previousX - i < 0 || previousY - i < 0) {
-          possibleTopLeft = true;
-          i = 8;
-          return;
+    if (
+      x < previousX &&
+      y < previousY &&
+      x + diff == previousX &&
+      y + diff == previousY
+    ) {
+      for (let i = diff; i > 0; i--) {
+        if (isWhite(currentBoard[previousX - i][previousY - i]) == false) {
+          limit = i;
+          break;
         }
         if (isWhite(currentBoard[previousX - i][previousY - i]) == true) {
-          possibleTopLeft = false;
-          return;
-        } else {
-          possibleTopLeft = true;
+          possible = false;
+          break;
+        }
+      }
+      console.log(limit);
+      console.log(previousX);
+
+      if (previousX <= limit) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // RIGHT UP CHECK
+
+    if (
+      x < previousX &&
+      y > previousY &&
+      x + diff == previousX &&
+      y - diff == previousY
+    ) {
+      console.log("going right up");
+      for (let i = 0; i < diff; i++) {
+        if (isWhite(currentBoard[x + i][y - i]) == true) {
+          possible = false;
+          break;
         }
       }
 
-      if (possibleTopLeft) {
+      if (possible) {
         move();
       }
     }
   }
   function moveWhiteRock(html, pons, x, y, previousX, previousY) {
-    let possibleLeft;
-    let possibleTop = true;
-    let possibleRight;
-    let possibleBottom;
+    let possible = true;
     let limitX;
     let limitY;
     const move = () => {
       updatePons("white", pons, x, y, previousX, previousY);
       removeBlack(html);
     };
+    // LEFT CHECK
+    if (y < previousY && x == previousX) {
+      for (let i = previousY - 1; i >= y; i--) {
+        if (isWhite(currentBoard[x][i]) == false) {
+          limitY = i;
 
-    // TOP CHECK
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (y < limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // UP CHECK
     if (x < previousX && y == previousY) {
       for (let i = previousX - 1; i >= x; i--) {
         if (isWhite(currentBoard[i][y]) == false) {
@@ -533,14 +596,52 @@ const game = () => {
           break;
         }
         if (isWhite(currentBoard[i][y]) == true) {
-          possibleTop = false;
+          possible = false;
           break;
         }
       }
       if (x < limitX) {
-        possibleTop = false;
+        possible = false;
       }
-      if (possibleTop) {
+      if (possible) {
+        move();
+      }
+    }
+    // RIGHT CHECK
+    if (y > previousY && x == previousX) {
+      for (let i = previousY + 1; i <= y; i++) {
+        if (isWhite(currentBoard[x][i]) == false) {
+          limitY = i;
+          break;
+        }
+        if (isWhite(currentBoard[x][i]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (y > limitY) {
+        possible = false;
+      }
+      if (possible) {
+        move();
+      }
+    }
+    // BOTTOM CHECK
+    if (x > previousX && y == previousY) {
+      for (let i = previousX + 1; i <= x; i++) {
+        if (isWhite(currentBoard[i][y]) == false) {
+          limitX = i;
+          break;
+        }
+        if (isWhite(currentBoard[i][y]) == true) {
+          possible = false;
+          break;
+        }
+      }
+      if (x > limitX) {
+        possible = false;
+      }
+      if (possible) {
         move();
       }
     }
