@@ -52,9 +52,9 @@ let currentBoard = [
   [14, 12, 13, 15, 16, 13, 12, 14],
   [11, 11, 11, 11, 11, 11, 11, 11],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 3, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 6, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
   [4, 2, 3, 5, 6, 3, 2, 4]
 ];
@@ -465,9 +465,19 @@ const game = () => {
     };
 
     if (y == previousY && previousX > x) {
-      if (previousX != 6 && previousX - 1 <= x && currentBoard[x][y] == 0) {
+      console.log(isWhite(currentBoard[previousX - 1][y]));
+      if (
+        previousX != 6 &&
+        previousX - 1 <= x &&
+        isWhite(currentBoard[x][y]) == null
+      ) {
         moveForward();
-      } else if (previousX == 6 && previousX - 2 <= x) {
+      } else if (
+        previousX == 6 &&
+        previousX - 2 <= x &&
+        isWhite(currentBoard[x][y]) == null &&
+        isWhite(currentBoard[previousX - 1][y]) == null
+      ) {
         moveBegining();
       }
     } else if (
@@ -896,7 +906,35 @@ const game = () => {
       }
     }
   }
-  function moveWhiteKing(html, pons, x, y, previousX, previousY) {}
+  function moveWhiteKing(html, pons, x, y, previousX, previousY) {
+    const move = () => {
+      updatePons("white", pons, x, y, previousX, previousY);
+      removeBlack(html);
+    };
+    console.log(x, y);
+    console.log(previousX, previousY);
+
+    if (
+      isWhite(currentBoard[x][y]) == false ||
+      isWhite(currentBoard[x][y]) == null
+    ) {
+      if ((x - 1 == previousX || x + 1 == previousX) && y == previousY) {
+        move();
+      } else if ((y - 1 == previousY || y + 1 == previousY) && x == previousX) {
+        move();
+      }
+      // TOP LEFT CHECK
+      else if (x + 1 == previousX && y + 1 == previousY) {
+        move();
+      } else if (x - 1 == previousX && y - 1 == previousY) {
+        move();
+      } else if (x - 1 == previousX && y + 1 == previousY) {
+        move();
+      } else if (x + 1 == previousX && y - 1 == previousY) {
+        move();
+      }
+    }
+  }
 
   // BLACK
   function moveBlackPons(html, pons, x, y, previousX, previousY) {
@@ -912,9 +950,17 @@ const game = () => {
       updatePons("black", pons, x, y, previousX, previousY);
     };
     if (y == previousY && previousX < x) {
-      if (previousX != 1 && previousX + 1 >= x && currentBoard[x][y] == 0) {
+      if (
+        previousX != 1 &&
+        previousX + 1 >= x &&
+        isWhite(currentBoard[x][y]) == null
+      ) {
         moveForward();
-      } else if (previousX == 1 && previousX + 2 >= x) {
+      } else if (
+        previousX == 1 &&
+        previousX + 2 >= x &&
+        isWhite(currentBoard[previousX + 1][y]) == null
+      ) {
         moveBegining();
       }
     } else if (
@@ -1338,7 +1384,6 @@ const game = () => {
       if (diff != limit && limit) {
         possible = false;
       }
-
       if (possible) {
         move();
       }
