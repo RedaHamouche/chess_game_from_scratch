@@ -2,12 +2,13 @@ const board = document.querySelector("#board");
 const player_display = document.querySelector(".player_turn");
 const undo = document.querySelector(".undo");
 let grid;
+const squareSize = 8;
 function createBoard() {
   let green = true;
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < squareSize; i++) {
     let row = document.createElement("div");
     row.classList.add("row");
-    for (let y = 0; y < 8; y++) {
+    for (let y = 0; y < squareSize; y++) {
       let column = document.createElement("div");
       column.classList.add("column");
       row.appendChild(column);
@@ -18,7 +19,7 @@ function createBoard() {
   let columns = document.querySelectorAll(".row div");
   grid = document.querySelectorAll(".row div");
   for (let i = 0; i < columns.length; i++) {
-    if (i % 8 == 0) {
+    if (i % squareSize == 0) {
       green = !green;
     }
     if (green) {
@@ -54,18 +55,16 @@ let currentBoard = [
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 16, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
   [4, 2, 3, 5, 6, 3, 2, 4]
 ];
 
 function InitBoard(board, element) {
   let cells = element;
-  let rows = 8;
-  let columns = 8;
-  for (let row = 0; row < rows; row++) {
-    for (let column = 0; column < columns; column++) {
-      element = cells[row * 8 + column];
+  for (let row = 0; row < squareSize; row++) {
+    for (let column = 0; column < squareSize; column++) {
+      element = cells[row * squareSize + column];
       let classEl = InitClass(board[row][column]);
       if (classEl) element.classList.add(classEl);
     }
@@ -132,11 +131,10 @@ InitBoard(currentBoard, grid);
 
 function UpdateBoard(board, element) {
   let cells = element;
-  let rows = 8;
-  let columns = 8;
-  for (let row = 0; row < rows; row++) {
-    for (let column = 0; column < columns; column++) {
-      element = cells[row * 8 + column];
+
+  for (let row = 0; row < squareSize; row++) {
+    for (let column = 0; column < squareSize; column++) {
+      element = cells[row * squareSize + column];
       let classEl = getClass(board[row][column]);
       if (classEl) {
         element.classList.add(classEl);
@@ -269,8 +267,8 @@ const game = () => {
     }
   }
   function getWhiteKingPos() {
-    for (let i = 0; i < 8; i++) {
-      for (let j = 0; j < 8; j++) {
+    for (let i = 0; i < squareSize; i++) {
+      for (let j = 0; j < squareSize; j++) {
         let kingPons = currentBoard[i][j];
         if (kingPons == 6) {
           kingIndex = [i, j];
@@ -509,7 +507,7 @@ const game = () => {
     const moveEatBegining = () => {
       updatePons("white", pons, x, y, previousX, previousY, blackX, blackY);
       removeBlack(html);
-      let el = grid[x * 8 + y + 8];
+      let el = grid[x * squareSize + y + squareSize];
       removeBlack(el);
     };
 
@@ -543,6 +541,7 @@ const game = () => {
       ) {
         blackX = previousX - 1;
         blackY = previousY - 1;
+        return;
         moveEatBegining();
       }
       if (
@@ -551,6 +550,7 @@ const game = () => {
       ) {
         blackX = previousX - 1;
         blackY = previousY + 1;
+        return;
         moveEatBegining();
       }
     } else if (
