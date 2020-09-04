@@ -52,7 +52,7 @@ let currentBoard = [
   [14, 12, 13, 15, 16, 13, 12, 14],
   [11, 11, 11, 11, 11, 11, 11, 11],
   [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 16, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
@@ -212,7 +212,7 @@ function getClass(x) {
 
 const game = () => {
   // let cells = grid;
-  let white_turn = true;
+  let white_turn = false;
   let pons_selected = null;
   let previousX;
   let previousY;
@@ -225,7 +225,7 @@ const game = () => {
         if (white_turn) {
           if (pons_selected == null) {
             OldNode = rowNodes.childNodes[y];
-            checkMateWhite(colNodes);
+
             white_selection(colNodes);
             previousX = x;
             previousY = y;
@@ -252,7 +252,23 @@ const game = () => {
 
   // UTILITIES
 
-  function checkMateWhite(pons) {
+  function checkMateWhite() {
+    console.log("true");
+  }
+
+  function checkPons(pons = 11, kingPos) {
+    let x = kingPos[0];
+    let y = kingPos[1];
+
+    if (
+      currentBoard[x - 1][y - 1] == pons ||
+      currentBoard[x - 1][y + 1] == pons
+    ) {
+      checkMateWhite();
+      console.log("black pons");
+    }
+  }
+  function getWhiteKingPos() {
     for (let i = 0; i < 8; i++) {
       for (let j = 0; j < 8; j++) {
         let kingPons = currentBoard[i][j];
@@ -261,35 +277,36 @@ const game = () => {
         }
       }
     }
-    return true;
+    checkPons(11, kingIndex);
   }
 
   function white_selection(pons) {
-    if (checkMateWhite()) {
-      for (let i = 0; i < grid.length; i++) {
-        if (grid[i].classList.contains("white_king")) {
-          grid[i].classList.add("selected");
-        }
-      }
-    } else if (
+    // if (checkMateWhite() == true) {
+    //   for (let i = 0; i < grid.length; i++) {
+    //     if (grid[i].classList.contains("white_king")) {
+    //       grid[i].classList.add("selected");
+    //       pons_selected = 6;
+    //     }
+    //   }
+    // } else
+    if (
       !pons.classList.contains("blank") &&
       !pons.classList.contains("black")
     ) {
       pons.classList.add("selected");
-    }
-
-    if (pons.classList.contains("white_pons")) {
-      pons_selected = 1;
-    } else if (pons.classList.contains("white_horse")) {
-      pons_selected = 2;
-    } else if (pons.classList.contains("white_bishop")) {
-      pons_selected = 3;
-    } else if (pons.classList.contains("white_rock")) {
-      pons_selected = 4;
-    } else if (pons.classList.contains("white_queen")) {
-      pons_selected = 5;
-    } else if (pons.classList.contains("white_king")) {
-      pons_selected = 6;
+      if (pons.classList.contains("white_pons")) {
+        pons_selected = 1;
+      } else if (pons.classList.contains("white_horse")) {
+        pons_selected = 2;
+      } else if (pons.classList.contains("white_bishop")) {
+        pons_selected = 3;
+      } else if (pons.classList.contains("white_rock")) {
+        pons_selected = 4;
+      } else if (pons.classList.contains("white_queen")) {
+        pons_selected = 5;
+      } else if (pons.classList.contains("white_king")) {
+        pons_selected = 6;
+      }
     }
   }
 
@@ -315,8 +332,9 @@ const game = () => {
       pons_selected = 16;
     }
   }
-  function checkMate() {}
+
   function move(OldNode, html, pons, x, y, previousX, previousY) {
+    getWhiteKingPos();
     // currentBoard[x][y] = pons;
     // currentBoard[previousX][previousY] = 0;
     switch (pons) {
@@ -367,7 +385,7 @@ const game = () => {
         removeOld(OldNode, "black", "black_queen");
         break;
       case 16:
-        moveBlackKing(pons, x, y, previousX, previousY);
+        moveBlackKing(html, pons, x, y, previousX, previousY);
         removeOld(OldNode, "black", "black_king");
         break;
       default:
@@ -501,6 +519,8 @@ const game = () => {
     } else if (
       (y - 1 == previousY || y + 1 == previousY) &&
       previousX > x &&
+      previousX != 1 &&
+      previousX - 1 <= x &&
       isWhite(currentBoard[x][y]) == false
     ) {
       moveEat();
@@ -969,21 +989,27 @@ const game = () => {
       if (
         previousX != 1 &&
         previousX + 1 >= x &&
+        previousY == y &&
         isWhite(currentBoard[x][y]) == null
       ) {
+        console.log("move forward");
         moveForward();
       } else if (
         previousX == 1 &&
         previousX + 2 >= x &&
+        previousY == y &&
         isWhite(currentBoard[previousX + 1][y]) == null
       ) {
+        console.log("move begin");
         moveBegining();
       }
     } else if (
       (y - 1 == previousY || y + 1 == previousY) &&
-      previousX < x &&
+      previousX != 1 &&
+      previousX + 1 >= x &&
       isWhite(currentBoard[x][y]) == true
     ) {
+      console.log("move");
       moveEat();
     }
   }
@@ -1405,7 +1431,33 @@ const game = () => {
       }
     }
   }
-  function moveBlackKing(html, pons, x, y, previousX, previousY) {}
+  function moveBlackKing(html, pons, x, y, previousX, previousY) {
+    const move = () => {
+      updatePons("black", pons, x, y, previousX, previousY);
+      removeWhite(html);
+    };
+
+    if (
+      isWhite(currentBoard[x][y]) == true ||
+      isWhite(currentBoard[x][y]) == null
+    ) {
+      if ((x - 1 == previousX || x + 1 == previousX) && y == previousY) {
+        move();
+      } else if ((y - 1 == previousY || y + 1 == previousY) && x == previousX) {
+        move();
+      }
+      // TOP LEFT CHECK
+      else if (x + 1 == previousX && y + 1 == previousY) {
+        move();
+      } else if (x - 1 == previousX && y - 1 == previousY) {
+        move();
+      } else if (x - 1 == previousX && y + 1 == previousY) {
+        move();
+      } else if (x + 1 == previousX && y - 1 == previousY) {
+        move();
+      }
+    }
+  }
 };
 
 game();
