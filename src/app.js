@@ -52,9 +52,9 @@ let currentBoard = [
   [14, 12, 13, 15, 16, 13, 12, 14],
   [11, 11, 11, 11, 11, 11, 11, 11],
   [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
   [0, 0, 0, 0, 0, 16, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
-  [0, 0, 0, 0, 0, 0, 0, 0],
   [1, 1, 1, 1, 1, 1, 1, 1],
   [4, 2, 3, 5, 6, 3, 2, 4]
 ];
@@ -212,7 +212,7 @@ function getClass(x) {
 
 const game = () => {
   // let cells = grid;
-  let white_turn = false;
+  let white_turn = true;
   let pons_selected = null;
   let previousX;
   let previousY;
@@ -471,7 +471,10 @@ const game = () => {
   //   UpdateBoard(currentBoard, grid);
   // });
 
-  function updatePons(color, pons, x, y, previousX, previousY) {
+  function updatePons(color, pons, x, y, previousX, previousY, blackX, blackY) {
+    if (blackX && blackY) {
+      currentBoard[blackX][blackY] = 0;
+    }
     currentBoard[previousX][previousY] = 0;
     currentBoard[x][y] = pons;
     if (color === "white") {
@@ -487,6 +490,8 @@ const game = () => {
 
   // WHITE
   function moveWhitePons(html, pons, x, y, previousX, previousY) {
+    let blackX;
+    let blackY;
     const moveForward = () => {
       updatePons("white", pons, x, y, previousX, previousY);
       removeBlack(html);
@@ -501,10 +506,20 @@ const game = () => {
       removeBlack(html);
     };
 
+    const moveEatBegining = () => {
+      updatePons("white", pons, x, y, previousX, previousY, blackX, blackY);
+      removeBlack(html);
+      let el = grid[x * 8 + y + 8];
+      removeBlack(el);
+    };
+
+    // TO DO PONS ANCHOR
+
     if (y == previousY && previousX > x) {
       if (
         previousX != 6 &&
         previousX - 1 <= x &&
+        previousY == y &&
         isWhite(currentBoard[x][y]) == null
       ) {
         moveForward();
@@ -519,7 +534,28 @@ const game = () => {
     } else if (
       (y - 1 == previousY || y + 1 == previousY) &&
       previousX > x &&
-      previousX != 1 &&
+      previousX == 6 &&
+      previousX - 2 <= x
+    ) {
+      if (
+        isWhite(currentBoard[previousX - 1][previousY - 1]) == false &&
+        previousY - 1 == y
+      ) {
+        blackX = previousX - 1;
+        blackY = previousY - 1;
+        moveEatBegining();
+      }
+      if (
+        isWhite(currentBoard[previousX - 1][previousY + 1]) == false &&
+        previousY == y - 1
+      ) {
+        blackX = previousX - 1;
+        blackY = previousY + 1;
+        moveEatBegining();
+      }
+    } else if (
+      (y - 1 == previousY || y + 1 == previousY) &&
+      previousX > x &&
       previousX - 1 <= x &&
       isWhite(currentBoard[x][y]) == false
     ) {
@@ -1000,7 +1036,6 @@ const game = () => {
         previousY == y &&
         isWhite(currentBoard[previousX + 1][y]) == null
       ) {
-        console.log("move begin");
         moveBegining();
       }
     } else if (
